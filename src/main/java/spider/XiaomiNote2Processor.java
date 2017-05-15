@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 public class XiaomiNote2Processor implements PageProcessor {
     //   抓取的论坛首页
     private String domain = "http://bbs.xiaomi.cn";
-    private String firstSite = "http://bbs.xiaomi.cn/f-487-364";
+    private String firstSite = "http://bbs.xiaomi.cn/f-385-1";
 
     //   抓取网站的相关配置，包括：编码、抓取间隔、重试次数等
     private Site site = Site.me().setRetryTimes(3).setSleepTime(1000);
