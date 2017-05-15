@@ -84,7 +84,8 @@ public abstract class BaseProcessor implements PageProcessor {
     }
 
     public Site getSite() {
-        return null;
+
+        return site;
     }
 
     // process是定制爬虫逻辑的核心接口，在这里编写抽取逻辑

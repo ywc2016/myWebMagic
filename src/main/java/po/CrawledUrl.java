@@ -3,7 +3,6 @@ package po;
 public class CrawledUrl {
 
     private long id;
-    ;
     private String url;
 
     public long getId() {
