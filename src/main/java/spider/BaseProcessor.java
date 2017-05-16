@@ -95,9 +95,14 @@ public abstract class BaseProcessor implements PageProcessor {
             try {
                 // 首先添加下一页
                 String url = page.getHtml().xpath("//li[@class='next']/a/@href").all().get(0);
+
+                if (url == null || "".equals(url)) {
+                    System.out.println("没有下一页帖子!");
+                }
                 page.addTargetRequest(url);
                 crawledUrlDao.add(url);
             } catch (Exception e) {
+                System.out.println("添加下一页帖子失败!");
                 e.printStackTrace();
             }
             try {
@@ -147,9 +152,17 @@ public abstract class BaseProcessor implements PageProcessor {
                 e.printStackTrace();
             }
             //抓取回复内容
-            getComments(page);
+            try {
+                getComments(page);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } else if (page.getUrl().regex(this.secondPageOfPostUrlPattern).match()) {//如果是帖子的第二页或者之后的页
-            getComments(page);
+            try {
+                getComments(page);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -206,7 +219,11 @@ public abstract class BaseProcessor implements PageProcessor {
                 e.printStackTrace();
             }
             comment.setPostId(postId);
-            commentsDao.add(comment);
+            try {
+                commentsDao.add(comment);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
