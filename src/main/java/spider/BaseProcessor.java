@@ -127,8 +127,9 @@ public abstract class BaseProcessor implements PageProcessor {
                 posts.setUserPage(page.getHtml().xpath("//div[@class='personLayer_msg']/a[@class='user_head']/@href").all().get(0));
                 posts.setPlate(page.getHtml().xpath("//div[@class='plateinfor']/a[@class='platename']/text()").all().get(0));
                 posts.setSecondary_plate(page.getHtml().xpath("//div[@class='invitation_con']/p[@class='txt']/a[@class='name']/text()").all().get(0));
+                String dateStr = null;
                 try {
-                    String dateStr = page.getHtml()
+                    dateStr = page.getHtml()
                             .xpath("//div[@class='invitation_con']/p[@class='txt']/span[@class='time']/text()").all().get(0);
                     if (Pattern.matches(patternWithoutYear, dateStr)) {
                         posts.setTime(sdf.parse(curYear + "-" + dateStr.substring(1)));
@@ -136,6 +137,7 @@ public abstract class BaseProcessor implements PageProcessor {
                         posts.setTime(sdf.parse(dateStr));
                     }
                 } catch (ParseException e) {
+                    System.out.println("时间有误!" + dateStr);
                     e.printStackTrace();
                 }
                 posts.setComefrom(page.getHtml()
