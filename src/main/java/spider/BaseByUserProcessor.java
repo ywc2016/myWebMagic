@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 public class BaseByUserProcessor implements PageProcessor {
     //   抓取的论坛首页
     private String domain = "http://bbs.xiaomi.cn";
-    private String firstSite = "http://bbs.xiaomi.cn/d-1";
+    private String firstSite = "http://bbs.xiaomi.cn/d-65";
     private String postListPageUrlPattern = domain + "/d-\\d+$";//domain + "/f\\-\\d+\\-\\d+$"
     private String firstPageOfPostUrlPattern = domain + "/t\\-\\d+$";//domain + "/t\\-\\d+$"
     //    private String secondPageOfPostUrlPattern = null;//this.domain + "/t-\\d+-\\d+-o1#comment_top"
@@ -84,7 +84,6 @@ public class BaseByUserProcessor implements PageProcessor {
             try {
                 // 首先添加下一页
                 String url = page.getHtml().xpath("//li[@class='next']/a/@href").all().get(0);
-                crawledUrlDao.add(url);
                 if (url == null || "".equals(url)) {
                     System.out.println("没有下一页帖子!");
                 }
@@ -203,8 +202,8 @@ public class BaseByUserProcessor implements PageProcessor {
 
                 List<String> urls = page.getHtml().xpath("//li[@class='next']/a/@href").all();
                 if (urls.size() != 0) {
-                    page.addTargetRequests(urls);
-                    crawledUrlDao.addAll(urls);
+                    page.addTargetRequest(urls.get(0));
+                    crawledUrlDao.add(urls.get(0));
                 } else {
                     System.out.println("没有下一页");
                 }
