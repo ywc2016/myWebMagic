@@ -1,7 +1,7 @@
 package spider;
 
 /**
- *
+ * @author yuwc
  */
 public class OtherProcessor extends BaseProcessor {
 

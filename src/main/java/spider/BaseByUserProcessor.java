@@ -32,9 +32,9 @@ public class BaseByUserProcessor implements PageProcessor {
     private String postListPageUrlPattern = domain + "/d-\\d+$";//domain + "/f\\-\\d+\\-\\d+$"
     private String firstPageOfPostUrlPattern = domain + "/t\\-\\d+$";//domain + "/t\\-\\d+$"
     //    private String secondPageOfPostUrlPattern = null;//this.domain + "/t-\\d+-\\d+-o1#comment_top"
-    private String userHomePageUrlPattern = this.domain + "/u-detail-\\d+";
-    private String firstUserPostsUrlPattern = this.domain + "/u-thread-\\d+";
-    private String secondUserPostsUrlPattern = this.domain + "/u-thread-\\d+-\\d+#thread";
+    private String userHomePageUrlPattern = this.domain + "/u-detail-\\d+$";
+    private String firstUserPostsUrlPattern = this.domain + "/u-thread-\\d+$";
+    private String secondUserPostsUrlPattern = this.domain + "/u-thread-\\d+-\\d+#thread$";
 
     //   抓取网站的相关配置，包括：编码、抓取间隔、重试次数等
     private Site site = Site.me().setRetryTimes(3).setSleepTime(1000);
@@ -224,6 +224,18 @@ public class BaseByUserProcessor implements PageProcessor {
                 e.printStackTrace();
             }
         } else if (page.getUrl().regex(this.secondUserPostsUrlPattern).match()) {
+            try {
+                // 首先添加下一页
+                String url = page.getHtml().xpath("//li[@class='next']/a/@href").all().get(0);
+                if (url == null || "".equals(url)) {
+                    System.out.println("没有下一页帖子!");
+                }
+                page.addTargetRequest(url);
+                crawledUrlDao.add(url);
+            } catch (Exception e) {
+                System.out.println("添加下一页帖子失败!");
+                e.printStackTrace();
+            }
             //将帖子url加入队列
             try {
                 List<String> urls = page.getHtml()
