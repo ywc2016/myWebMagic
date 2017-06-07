@@ -1,5 +1,11 @@
 package util;
 
+import db.BadgeDao;
+import db.MedalDao;
+import po.Badge;
+import po.Medal;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,8 +31,35 @@ public class Utils {
         return result.toString();
     }
 
-    public List<String> convertMedalListToIdlist(List<String> medalList) {
-        return null;
+    /**
+     * @param medalImageList
+     * @return
+     */
+    public List<String> convertMedalImageListToIdlist(List<String> medalImageList) {
+        MedalDao medalDao = new MedalDao();
+        List<String> ids = new ArrayList<String>();
+        for (String medalImage : medalImageList) {
+            List<Medal> list = medalDao.findByPropertyEqual("imageUrl", medalImage, "String");
+            if (list.size() == 0) {
+                ids.add("-1");
+            } else {
+                ids.add(list.get(0).getId() + "");
+            }
+        }
+        return ids;
     }
 
+    public List<String> convertBadgeImageListToIdList(List<String> badgeImageList) {
+        BadgeDao badgeDao = new BadgeDao();
+        List<String> ids = new ArrayList<String>();
+        for (String badgeImage : badgeImageList) {
+            List<Badge> list = badgeDao.findByPropertyEqual("imageUrl", badgeImage, "String");
+            if (list.size() == 0) {
+                ids.add("-1");
+            } else {
+                ids.add(list.get(0).getId() + "");
+            }
+        }
+        return ids;
+    }
 }

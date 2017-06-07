@@ -49,7 +49,7 @@ public abstract class BaseProcessor implements PageProcessor {
     private UserDao userDao = new UserDao();
     private Utils utils = new Utils();
 
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     private String patternWithYear = "\\s*\\d{4}-\\d{2}-\\d{2}\\s*\\d{2}:\\d{2}:\\d{2}\\s*";
     private String patternWithoutYear = "\\s*\\d{2}-\\d{2}\\s*\\d{2}:\\d{2}:\\d{2}\\s*";
     private String patterOfSecondPageOfPost = "(" + this.domain + "/t-\\d+)-\\d+-o1#comment_top";
@@ -99,6 +99,7 @@ public abstract class BaseProcessor implements PageProcessor {
 
     // process是定制爬虫逻辑的核心接口，在这里编写抽取逻辑
     public void process(Page page) {
+
         // 列表页
         if (page.getUrl().regex(this.postListPageUrlPattern).match()) { //不是帖子且是帖子列表页面
 
@@ -118,6 +119,8 @@ public abstract class BaseProcessor implements PageProcessor {
     }
 
     private void processUserHomePage(Page page) {
+        //SimpleDateFormat是非线程安全的
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
             User user = new User();
             user.setMiid(Long.parseLong(page.getHtml()
@@ -209,10 +212,13 @@ public abstract class BaseProcessor implements PageProcessor {
             }
 
             //产品类图标
-            List<String> medalList = page.getHtml().xpath("//div[@class='user clearfix']/div[@class='medal']/ul/li/a/@href").all();
-            user.setMedalIds(utils.listToString(utils.convertMedalListToIdlist(medalList)));
+            List<String> medalImageList = page.getHtml().xpath("//div[@class='user clearfix']/div[@class='medal']/ul/li/a/img/@src").all();
+            user.setMedalIds(utils.listToString(utils.convertMedalImageListToIdlist(medalImageList)));
 
-            List<String> badgeList = page.getHtml().xpath("//p[@class='badge']/a/img/@src").all();
+            //论坛荣誉badge
+            List<String> badgeImageList = page.getHtml().xpath("//p[@class='badge']/a/img/@src").all();
+            user.setBadgeIds(utils.listToString(utils.convertBadgeImageListToIdList(badgeImageList)));
+
             userDao.save(user);
         } catch (NumberFormatException e) {
             e.printStackTrace();
@@ -238,10 +244,12 @@ public abstract class BaseProcessor implements PageProcessor {
      * @param page
      */
     private void processFirstPostPage(Page page) {
+        //SimpleDateFormat是非线程安全的
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
 
             List<Posts> postList = postsDao.findByPropertyEqual("url", page.getUrl().toString(), "String");
-            if (postList != null && postList.size() != 0) {  //是第一页,如果是新的帖子,添加一条帖子信息
+            if (postList == null || postList.size() == 0) {  //是第一页,如果是新的帖子,添加一条帖子信息
                 Posts posts = new Posts();
                 posts.setUrl(page.getUrl().toString());
                 posts.setTitle(page.getHtml().xpath("//div[@class='invitation_con']/h1/span[@class='name']/text()").all().get(0).toString());
@@ -274,9 +282,9 @@ public abstract class BaseProcessor implements PageProcessor {
                 String contextHtml = page.getHtml().xpath("//div[@class='invitation_content']").all().get(0);
                 Document doc = Jsoup.parse(contextHtml);
                 posts.setContent(doc.text());
-                postsDao.add(posts);
+                postsDao.save(posts);
             } else {
-                System.out.println(page.getUrl().toString() + ":该帖已经入库!");
+                System.out.println(page.getUrl().toString() + ":该帖已经存在!");
             }
 
         } catch (NumberFormatException e) {
@@ -337,6 +345,8 @@ public abstract class BaseProcessor implements PageProcessor {
      * @param page
      */
     private void getComments(Page page) {
+        //SimpleDateFormat是非线程安全的
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
             //把下一页评论加入队列
             List<String> urls = page.getHtml().xpath("//li[@class='next']/a/@href").all();
@@ -346,7 +356,6 @@ public abstract class BaseProcessor implements PageProcessor {
             System.out.println("没有下一页");
             e.printStackTrace();
         }
-
 
         String postUrl = null;
         if (page.getUrl().regex(this.firstPageOfPostUrlPattern).match()) {//帖子第一页
@@ -370,23 +379,26 @@ public abstract class BaseProcessor implements PageProcessor {
                 System.out.println("评论为空!");
                 e.printStackTrace();
             }
-            List<Comments> commentsList = commentsDao.findByPropertyEqual("contentHash",
-                    comment.getContentHash(), "String");
-            if (commentsList != null && commentsList.size() != 0) {
-                comment.setUserName(doc.select("a.auth_name").get(0).text());
+            comment.setUserName(doc.select("a.auth_name").get(0).text());
+
+            try {
+                String dateStr = doc.select("span.time").get(1).text();
+                if (Pattern.matches(patternWithoutYear, dateStr)) {
+                    comment.setTime(new Timestamp(sdf.parse(curYear + "-" + dateStr.substring(1)).getTime()));
+                } else if (Pattern.matches(patternWithYear, dateStr)) {
+                    comment.setTime(new Timestamp(sdf.parse(dateStr).getTime()));
+                }
+            } catch (ParseException e) {
+                System.out.println("日期字符串有误! " + doc.select("span.time").get(1).text());
+                e.printStackTrace();
+            }
+
+            List<Comments> commentsList = commentsDao.findByUserNameAndTime(comment.getUserName(), comment.getTime());
+
+            if (commentsList == null || commentsList.size() == 0) {//新的回复,需要入库
+
                 comment.setUserPage(doc.select("a.auth_name").get(0).attr("href"));
                 comment.setComefrom(doc.select("span.comefrom").get(0).text());
-                try {
-                    String dateStr = doc.select("span.time").get(1).text();
-                    if (Pattern.matches(patternWithoutYear, dateStr)) {
-                        comment.setTime(new Timestamp(sdf.parse(curYear + "-" + dateStr.substring(1)).getTime()));
-                    } else if (Pattern.matches(patternWithYear, dateStr)) {
-                        comment.setTime(new Timestamp(sdf.parse(dateStr).getTime()));
-                    }
-                } catch (ParseException e) {
-                    System.out.println("日期字符串有误! " + doc.select("span.time").get(1).text());
-                    e.printStackTrace();
-                }
 
                 comment.setPostId(postId);
 
@@ -396,7 +408,7 @@ public abstract class BaseProcessor implements PageProcessor {
                     e.printStackTrace();
                 }
             } else {
-                System.out.println(page.getUrl().toString() + ":评论 <" + comment.getContent() + "> 已经入库");
+                System.out.println(page.getUrl().toString() + ":评论 <" + comment.getContent() + "> 已经存在.");
             }
         }
     }
