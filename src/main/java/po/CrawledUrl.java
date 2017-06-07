@@ -2,10 +2,12 @@ package po;
 
 import javax.persistence.*;
 
+/**
+ * Created by ywcrm on 2017/6/7.
+ */
 @Entity
 @Table(name = "crawled_url", schema = "xiaomi", catalog = "")
 public class CrawledUrl {
-
     private long id;
     private String url;
 

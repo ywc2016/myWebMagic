@@ -5,7 +5,7 @@ import po.Comments;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class CommentsDao {
+public class CommentsDao extends BaseDao<Comments>{
 
 
     public CommentsDao() {

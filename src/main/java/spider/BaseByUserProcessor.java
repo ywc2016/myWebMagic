@@ -10,9 +10,10 @@ import po.Posts;
 import po.User;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
-import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.processor.PageProcessor;
+import util.Utils;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -43,6 +44,7 @@ public class BaseByUserProcessor implements PageProcessor {
     private CommentsDao commentsDao = new CommentsDao();
     private CrawledUrlDao crawledUrlDao = new CrawledUrlDao();
     private UserDao userDao = new UserDao();
+    private Utils utils = new Utils();
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private String patternWithYear = "\\s*\\d{4}-\\d{2}-\\d{2}\\s*\\d{2}:\\d{2}:\\d{2}\\s*";//2017-05-18 16:08:37
@@ -124,9 +126,9 @@ public class BaseByUserProcessor implements PageProcessor {
                             .xpath("//li[@class='menu_item current']/a/@href").all().toString());
                     e.printStackTrace();
                 }
-                user.setTopic_num(Integer.parseInt(page.getHtml()
+                user.setTopicNum(Integer.parseInt(page.getHtml()
                         .xpath("//div[@class='wrap lively']/ul/li/span[@class='num']/text()").all().get(0)));
-                user.setReply_num(Integer.parseInt(page.getHtml()
+                user.setReplyNum(Integer.parseInt(page.getHtml()
                         .xpath("//div[@class='wrap lively']/ul/li/span[@class='num']/text()").all().get(1)));
                 user.setExp(Integer.parseInt(page.getHtml()
                         .xpath("//div[@class='wrap lively']/ul/li/span[@class='num']/text()").all().get(2)));
@@ -134,10 +136,10 @@ public class BaseByUserProcessor implements PageProcessor {
                         .xpath("//div[@class='wrap lively']/ul/li/span[@class='num']/text()").all().get(3)));
                 user.setEmail(page.getHtml()
                         .xpath("//ul[@class='msg']/li/span[@class='num']/text()").all().get(2));
-                user.setUser_group(page.getHtml().xpath("//ul[@class='msg']/li/span[@class='num']/text()").all().get(1));
-                user.setHome_page(page.getUrl().all().get(0));
+                user.setUserGroup(page.getHtml().xpath("//ul[@class='msg']/li/span[@class='num']/text()").all().get(1));
+                user.setHomePage(page.getUrl().all().get(0));
                 user.setName(page.getHtml().xpath("//strong[@class='username']/text()").all().get(0));
-                user.setVip_level(page.getHtml()
+                user.setVipLevel(page.getHtml()
                         .xpath("//div[@class='score']//span/text()").all().get(0));
 //                user.setContribute(Integer.parseInt(page.getHtml()
 //                        .xpath("//div[@class='score']//span/text()").all().get(1)));
@@ -145,9 +147,9 @@ public class BaseByUserProcessor implements PageProcessor {
                     String s = page.getHtml()
                             .xpath("//div[@class='score']//span/text()").all().get(2);
                     if (s.equals("无")) {
-                        user.setVip_rank(-1);
+                        user.setVipRank(-1);
                     } else {
-                        user.setVip_rank(Integer.parseInt(s));
+                        user.setVipRank(Integer.parseInt(s));
                     }
 
 
@@ -160,39 +162,39 @@ public class BaseByUserProcessor implements PageProcessor {
                         .xpath("//div[@class='score']//span/text()")
                         .all().get(3)));
                 try {
-                    user.setLast_access_time(sdf.parse(page.getHtml()
-                            .xpath("//div[@class='wrap lively']/dl/dd/span/text()").all().get(0)));
+                    user.setLastAccessTime(new Timestamp(sdf.parse(page.getHtml()
+                            .xpath("//div[@class='wrap lively']/dl/dd/span/text()").all().get(0)).getTime()));
                 } catch (ParseException e) {
                     System.out.println("日期格式有误!" + page.getHtml()
                             .xpath("//div[@class='wrap lively']/dl/dd/span/text()").all().get(0));
                     e.printStackTrace();
                 }
                 try {
-                    user.setLast_active_time(sdf.parse(page.getHtml()
-                            .xpath("//div[@class='wrap lively']/dl/dd/span/text()").all().get(2)));
+                    user.setLastActiveTime(new Timestamp(sdf.parse(page.getHtml()
+                            .xpath("//div[@class='wrap lively']/dl/dd/span/text()").all().get(2)).getTime()));
                 } catch (ParseException e) {
                     System.out.println("日期格式有误!" + page.getHtml()
                             .xpath("//div[@class='wrap lively']/dl/dd/span/text()").all().get(2));
                     e.printStackTrace();
                 }
                 try {
-                    user.setRegister_time(sdf.parse(page.getHtml()
-                            .xpath("//div[@class='wrap lively']/dl/dd/span/text()").all().get(4)));
+                    user.setRegisterTime(new Timestamp(sdf.parse(page.getHtml()
+                            .xpath("//div[@class='wrap lively']/dl/dd/span/text()").all().get(4)).getTime()));
                 } catch (ParseException e) {
                     System.out.println("日期格式有误!" + page.getHtml()
                             .xpath("//div[@class='wrap lively']/dl/dd/span/text()").all().get(4));
                     e.printStackTrace();
                 }
                 try {
-                    user.setLast_deliver_time(sdf.parse(page.getHtml()
-                            .xpath("//div[@class='wrap lively']/dl/dd/span/text()").all().get(5)));
+                    user.setLastDeliverTime(new Timestamp(sdf.parse(page.getHtml()
+                            .xpath("//div[@class='wrap lively']/dl/dd/span/text()").all().get(5)).getTime()));
                 } catch (ParseException e) {
                     System.out.println("日期格式有误!" + page.getHtml()
                             .xpath("//div[@class='wrap lively']/dl/dd/span/text()").all().get(5));
                     e.printStackTrace();
                 }
 
-                userDao.add(user);
+                userDao.save(user);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
@@ -257,20 +259,20 @@ public class BaseByUserProcessor implements PageProcessor {
                     System.out.println("获取标题失败!" + page.getUrl());
                     e.printStackTrace();
                 }
-                posts.setStamps(listToString(page.getHtml()
+                posts.setStamps(utils.listToString(page.getHtml()
                         .xpath("//div[@class='invitation_con']/p[@class='txt']/span[@class='marktxt']/text()").all()));
                 posts.setUserName(page.getHtml().xpath("//a[@class='user_name']/text()").all().get(0));
                 posts.setUserPage(page.getHtml().xpath("//div[@class='personLayer_msg']/a[@class='user_head']/@href").all().get(0));
                 posts.setPlate(page.getHtml().xpath("//div[@class='plateinfor']/a[@class='platename']/text()").all().get(0));
-                posts.setSecondary_plate(page.getHtml().xpath("//div[@class='invitation_con']/p[@class='txt']/a[@class='name']/text()").all().get(0));
+                posts.setSecondaryPlate(page.getHtml().xpath("//div[@class='invitation_con']/p[@class='txt']/a[@class='name']/text()").all().get(0));
                 String dateStr = null;
                 try {
                     dateStr = page.getHtml()
                             .xpath("//div[@class='invitation_con']/p[@class='txt']/span[@class='time']/text()").all().get(0);
                     if (Pattern.matches(patternWithoutYear, dateStr)) {
-                        posts.setTime(sdf.parse(curYear + "-" + dateStr.substring(1)));
+                        posts.setTime(new Timestamp(sdf.parse(curYear + "-" + dateStr.substring(1)).getTime()));
                     } else if (Pattern.matches(patternWithYear, dateStr)) {
-                        posts.setTime(sdf.parse(dateStr));
+                        posts.setTime(new Timestamp(sdf.parse(dateStr).getTime()));
                     }
                 } catch (ParseException e) {
                     System.out.println("时间有误!" + dateStr);
@@ -285,7 +287,7 @@ public class BaseByUserProcessor implements PageProcessor {
                 String contextHtml = page.getHtml().xpath("//div[@class='invitation_content']").all().get(0);
                 Document doc = Jsoup.parse(contextHtml);
                 posts.setContent(doc.text());
-                postsDao.add(posts);
+                postsDao.save(posts);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
@@ -293,35 +295,15 @@ public class BaseByUserProcessor implements PageProcessor {
 
     }
 
-
-    // 把list转换为string，用,分割
-
-    public static String listToString(List<String> stringList) {
-        if (stringList == null) {
-            return null;
-        }
-        StringBuilder result = new StringBuilder();
-        boolean flag = false;
-        for (String string : stringList) {
-            if (flag) {
-                result.append(",");
-            } else {
-                flag = true;
-            }
-            result.append(string);
-        }
-        return result.toString();
-    }
-
-    public void startSpider() {
-        long startTime, endTime;
-        System.out.println("【爬虫开始】请耐心等待...");
-        startTime = System.currentTimeMillis();
-        // 开启5个线程，启动爬虫
-        Spider.create(this).addUrl(this.getFirstSite()).thread(5).run();
-        endTime = System.currentTimeMillis();
-        System.out.println("【爬虫结束】耗时约"
-                + ((endTime - startTime) / 1000) + "秒，已保存到数据库，请查收！");
-    }
+//    public void startSpider() {
+//        long startTime, endTime;
+//        System.out.println("【爬虫开始】请耐心等待...");
+//        startTime = System.currentTimeMillis();
+//        // 开启5个线程，启动爬虫
+//        Spider.create(this).addUrl(this.getFirstSite()).thread(5).run();
+//        endTime = System.currentTimeMillis();
+//        System.out.println("【爬虫结束】耗时约"
+//                + ((endTime - startTime) / 1000) + "秒，已保存到数据库，请查收！");
+//    }
 
 }

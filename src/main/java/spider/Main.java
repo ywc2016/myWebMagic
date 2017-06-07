@@ -6,7 +6,7 @@ package spider;
 public class Main {
     public static void main(String[] args) {
 //        new OtherProcessor("http://bbs.xiaomi.cn/f-451-12").startSpider();//小米5/5c/5s/Plus
-        new BaseByUserProcessor().startSpider();
+//        new BaseByUserProcessor().startSpider();
     }
 
 }

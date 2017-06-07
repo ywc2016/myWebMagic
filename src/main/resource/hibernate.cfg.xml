@@ -16,6 +16,8 @@
         <mapping class="po.Comments"/>
         <mapping class="po.CrawledUrl"/>
         <mapping class="po.Posts"/>
+        <mapping class="po.Medal"/>
+        <mapping class="po.Badge"/>
         <mapping class="po.User"/>
     </session-factory>
 

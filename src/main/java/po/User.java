@@ -5,39 +5,31 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.sql.Timestamp;
-import java.util.Date;
 
-
+/**
+ * Created by ywcrm on 2017/6/7.
+ */
 @Entity
 public class User {
-
     private long id;
-    private String home_page;
-    private String name;
-    private String vip_level;
-    private int contribute;
-    private int vip_rank;
-    private int score;
-    private long miid;
-    private String user_group;
-    private String email;
-    private int topic_num;
-    private int reply_num;
-    private int exp;
-    private Date last_active_time;
-    private Date register_time;
-    private Date last_access_time;
-    private Date last_deliver_time;
     private String homePage;
+    private String name;
     private String vipLevel;
+    private Integer contribute;
     private Integer vipRank;
+    private int score;
+    private Long miid;
     private String userGroup;
+    private String email;
     private Integer topicNum;
     private Integer replyNum;
+    private Integer exp;
     private Timestamp lastActiveTime;
     private Timestamp registerTime;
     private Timestamp lastAccessTime;
     private Timestamp lastDeliverTime;
+    private String medalIds;
+    private String badgeIds;
 
     @Id
     @Column(name = "id")
@@ -49,24 +41,14 @@ public class User {
         this.id = id;
     }
 
-    public void setContribute(Integer contribute) {
-        this.contribute = contribute;
+    @Basic
+    @Column(name = "home_page")
+    public String getHomePage() {
+        return homePage;
     }
 
-    public void setMiid(Long miid) {
-        this.miid = miid;
-    }
-
-    public void setExp(Integer exp) {
-        this.exp = exp;
-    }
-
-    public String getHome_page() {
-        return home_page;
-    }
-
-    public void setHome_page(String home_page) {
-        this.home_page = home_page;
+    public void setHomePage(String homePage) {
+        this.homePage = homePage;
     }
 
     @Basic
@@ -79,30 +61,34 @@ public class User {
         this.name = name;
     }
 
-    public String getVip_level() {
-        return vip_level;
+    @Basic
+    @Column(name = "vip_level")
+    public String getVipLevel() {
+        return vipLevel;
     }
 
-    public void setVip_level(String vip_level) {
-        this.vip_level = vip_level;
+    public void setVipLevel(String vipLevel) {
+        this.vipLevel = vipLevel;
     }
 
     @Basic
     @Column(name = "contribute")
-    public int getContribute() {
+    public Integer getContribute() {
         return contribute;
     }
 
-    public void setContribute(int contribute) {
+    public void setContribute(Integer contribute) {
         this.contribute = contribute;
     }
 
-    public int getVip_rank() {
-        return vip_rank;
+    @Basic
+    @Column(name = "vip_rank")
+    public Integer getVipRank() {
+        return vipRank;
     }
 
-    public void setVip_rank(int vip_rank) {
-        this.vip_rank = vip_rank;
+    public void setVipRank(Integer vipRank) {
+        this.vipRank = vipRank;
     }
 
     @Basic
@@ -117,118 +103,12 @@ public class User {
 
     @Basic
     @Column(name = "miid")
-    public long getMiid() {
+    public Long getMiid() {
         return miid;
     }
 
-    public void setMiid(long miid) {
+    public void setMiid(Long miid) {
         this.miid = miid;
-    }
-
-    public String getUser_group() {
-        return user_group;
-    }
-
-    public void setUser_group(String user_group) {
-        this.user_group = user_group;
-    }
-
-    @Basic
-    @Column(name = "email")
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public int getTopic_num() {
-        return topic_num;
-    }
-
-    public void setTopic_num(int topic_num) {
-        this.topic_num = topic_num;
-    }
-
-    public int getReply_num() {
-        return reply_num;
-    }
-
-    public void setReply_num(int reply_num) {
-        this.reply_num = reply_num;
-    }
-
-    @Basic
-    @Column(name = "exp")
-    public int getExp() {
-        return exp;
-    }
-
-    public void setExp(int exp) {
-        this.exp = exp;
-    }
-
-    public Date getLast_active_time() {
-        return last_active_time;
-    }
-
-    public void setLast_active_time(Date last_active_time) {
-        this.last_active_time = last_active_time;
-    }
-
-    public Date getRegister_time() {
-        return register_time;
-    }
-
-    public void setRegister_time(Date register_time) {
-        this.register_time = register_time;
-    }
-
-    public Date getLast_access_time() {
-        return last_access_time;
-    }
-
-    public void setLast_access_time(Date last_access_time) {
-        this.last_access_time = last_access_time;
-    }
-
-    public Date getLast_deliver_time() {
-        return last_deliver_time;
-    }
-
-    public void setLast_deliver_time(Date last_deliver_time) {
-        this.last_deliver_time = last_deliver_time;
-    }
-
-    @Basic
-    @Column(name = "home_page")
-    public String getHomePage() {
-        return homePage;
-    }
-
-    public void setHomePage(String homePage) {
-        this.homePage = homePage;
-    }
-
-    @Basic
-    @Column(name = "vip_level")
-    public String getVipLevel() {
-        return vipLevel;
-    }
-
-    public void setVipLevel(String vipLevel) {
-        this.vipLevel = vipLevel;
-    }
-
-    @Basic
-    @Column(name = "vip_rank")
-    public Integer getVipRank() {
-        return vipRank;
-    }
-
-    public void setVipRank(Integer vipRank) {
-        this.vipRank = vipRank;
     }
 
     @Basic
@@ -239,6 +119,16 @@ public class User {
 
     public void setUserGroup(String userGroup) {
         this.userGroup = userGroup;
+    }
+
+    @Basic
+    @Column(name = "email")
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     @Basic
@@ -259,6 +149,16 @@ public class User {
 
     public void setReplyNum(Integer replyNum) {
         this.replyNum = replyNum;
+    }
+
+    @Basic
+    @Column(name = "exp")
+    public Integer getExp() {
+        return exp;
+    }
+
+    public void setExp(Integer exp) {
+        this.exp = exp;
     }
 
     @Basic
@@ -301,6 +201,26 @@ public class User {
         this.lastDeliverTime = lastDeliverTime;
     }
 
+    @Basic
+    @Column(name = "medal_ids")
+    public String getMedalIds() {
+        return medalIds;
+    }
+
+    public void setMedalIds(String medalIds) {
+        this.medalIds = medalIds;
+    }
+
+    @Basic
+    @Column(name = "badge_ids")
+    public String getBadgeIds() {
+        return badgeIds;
+    }
+
+    public void setBadgeIds(String badgeIds) {
+        this.badgeIds = badgeIds;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -309,18 +229,18 @@ public class User {
         User user = (User) o;
 
         if (id != user.id) return false;
-        if (contribute != user.contribute) return false;
         if (score != user.score) return false;
-        if (miid != user.miid) return false;
-        if (exp != user.exp) return false;
-        if (name != null ? !name.equals(user.name) : user.name != null) return false;
-        if (email != null ? !email.equals(user.email) : user.email != null) return false;
         if (homePage != null ? !homePage.equals(user.homePage) : user.homePage != null) return false;
+        if (name != null ? !name.equals(user.name) : user.name != null) return false;
         if (vipLevel != null ? !vipLevel.equals(user.vipLevel) : user.vipLevel != null) return false;
+        if (contribute != null ? !contribute.equals(user.contribute) : user.contribute != null) return false;
         if (vipRank != null ? !vipRank.equals(user.vipRank) : user.vipRank != null) return false;
+        if (miid != null ? !miid.equals(user.miid) : user.miid != null) return false;
         if (userGroup != null ? !userGroup.equals(user.userGroup) : user.userGroup != null) return false;
+        if (email != null ? !email.equals(user.email) : user.email != null) return false;
         if (topicNum != null ? !topicNum.equals(user.topicNum) : user.topicNum != null) return false;
         if (replyNum != null ? !replyNum.equals(user.replyNum) : user.replyNum != null) return false;
+        if (exp != null ? !exp.equals(user.exp) : user.exp != null) return false;
         if (lastActiveTime != null ? !lastActiveTime.equals(user.lastActiveTime) : user.lastActiveTime != null)
             return false;
         if (registerTime != null ? !registerTime.equals(user.registerTime) : user.registerTime != null) return false;
@@ -328,6 +248,8 @@ public class User {
             return false;
         if (lastDeliverTime != null ? !lastDeliverTime.equals(user.lastDeliverTime) : user.lastDeliverTime != null)
             return false;
+        if (medalIds != null ? !medalIds.equals(user.medalIds) : user.medalIds != null) return false;
+        if (badgeIds != null ? !badgeIds.equals(user.badgeIds) : user.badgeIds != null) return false;
 
         return true;
     }
@@ -338,19 +260,21 @@ public class User {
         result = 31 * result + (homePage != null ? homePage.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (vipLevel != null ? vipLevel.hashCode() : 0);
-        result = 31 * result + contribute;
+        result = 31 * result + (contribute != null ? contribute.hashCode() : 0);
         result = 31 * result + (vipRank != null ? vipRank.hashCode() : 0);
         result = 31 * result + score;
-        result = 31 * result + (int) (miid ^ (miid >>> 32));
+        result = 31 * result + (miid != null ? miid.hashCode() : 0);
         result = 31 * result + (userGroup != null ? userGroup.hashCode() : 0);
         result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + (topicNum != null ? topicNum.hashCode() : 0);
         result = 31 * result + (replyNum != null ? replyNum.hashCode() : 0);
-        result = 31 * result + exp;
+        result = 31 * result + (exp != null ? exp.hashCode() : 0);
         result = 31 * result + (lastActiveTime != null ? lastActiveTime.hashCode() : 0);
         result = 31 * result + (registerTime != null ? registerTime.hashCode() : 0);
         result = 31 * result + (lastAccessTime != null ? lastAccessTime.hashCode() : 0);
         result = 31 * result + (lastDeliverTime != null ? lastDeliverTime.hashCode() : 0);
+        result = 31 * result + (medalIds != null ? medalIds.hashCode() : 0);
+        result = 31 * result + (badgeIds != null ? badgeIds.hashCode() : 0);
         return result;
     }
 }

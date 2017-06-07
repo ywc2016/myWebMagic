@@ -3,10 +3,10 @@ package db;
 import po.Posts;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
-public class PostsDao {
+public class PostsDao extends BaseDao<Posts> {
 
     public PostsDao() {
 
@@ -25,7 +25,7 @@ public class PostsDao {
             ps.setString(5, posts.getUserName());
             ps.setString(6, posts.getUserPage());
             ps.setString(7, posts.getPlate());
-            ps.setString(8, posts.getSecondary_plate());
+            ps.setString(8, posts.getSecondaryPlate());
             ps.setDate(9, new java.sql.Date(posts.getTime().getTime()));
             ps.setString(10, posts.getComefrom());
             ps.setInt(11, posts.getCheckAmount());
@@ -39,18 +39,20 @@ public class PostsDao {
         return -1;
     }
 
-    public long findIdByField(Class clazz, String fieldName, String value) {
-        if (clazz.equals(String.class)) {
-            try {
-                String sql = "SELECT id FROM posts where " + fieldName + "='" + value + "';";
-                PreparedStatement ps = MysqlCon.getConn().prepareStatement(sql);
-                ResultSet rs = ps.executeQuery();
-                if (rs.next()) {
-                    return rs.getLong("id");
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+    public long findIdByField(String type, String fieldName, String value) {
+        if (type.equals("String")) {
+//            try {
+//                String sql = "SELECT id FROM posts where " + fieldName + "='" + value + "';";
+//                PreparedStatement ps = MysqlCon.getConn().prepareStatement(sql);
+//                ResultSet rs = ps.executeQuery();
+//                if (rs.next()) {
+//                    return rs.getLong("id");
+//                }
+//            } catch (SQLException e) {
+//                e.printStackTrace();
+//            }
+            List<Posts> postsList = this.findByPropertyEqual(fieldName, value, "String");
+            return postsList.get(0).getId();
         }
         return 0L;
     }

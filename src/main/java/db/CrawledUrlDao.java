@@ -1,27 +1,33 @@
 package db;
 
+import po.CrawledUrl;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-public class CrawledUrlDao {
+public class CrawledUrlDao extends BaseDao<CrawledUrl> {
 
     public CrawledUrlDao() {
 
     }
 
-    public int add(String crawledUrl) {
-        try {
-            String sql = "INSERT INTO crawled_url (url) VALUES (?);";
-            PreparedStatement ps = MysqlCon.getConn().prepareStatement(sql);
-            ps.setString(1, crawledUrl);
+    public void add(String url) {
+        CrawledUrl crawledUrl = new CrawledUrl();
+        crawledUrl.setUrl(url);
+        this.save(crawledUrl);
 
-            return ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return -1;
+//        try {
+//            String sql = "INSERT INTO crawled_url (url) VALUES (?);";
+//            PreparedStatement ps = MysqlCon.getConn().prepareStatement(sql);
+//            ps.setString(1, crawledUrl);
+//
+//            return ps.executeUpdate();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return -1;
     }
 
     public void addAll(List<String> addUrlList) {

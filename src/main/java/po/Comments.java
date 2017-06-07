@@ -5,27 +5,20 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.sql.Timestamp;
-import java.util.Date;
 
-
+/**
+ * Created by ywcrm on 2017/6/7.
+ */
 @Entity
 public class Comments {
-
     private long id;
     private String userName;
     private String userPage;
-    private Date time;
     private String comefrom;
+    private Timestamp time;
     private String content;
-    private long postId;
-
-    public void setTime(Timestamp time) {
-        this.time = time;
-    }
-
-    public void setPostId(Long postId) {
-        this.postId = postId;
-    }
+    private Long postId;
+    private String contentHash;
 
     @Id
     @Column(name = "id")
@@ -58,16 +51,6 @@ public class Comments {
     }
 
     @Basic
-    @Column(name = "time")
-    public Date getTime() {
-        return time;
-    }
-
-    public void setTime(Date time) {
-        this.time = time;
-    }
-
-    @Basic
     @Column(name = "comefrom")
     public String getComefrom() {
         return comefrom;
@@ -75,6 +58,16 @@ public class Comments {
 
     public void setComefrom(String comefrom) {
         this.comefrom = comefrom;
+    }
+
+    @Basic
+    @Column(name = "time")
+    public Timestamp getTime() {
+        return time;
+    }
+
+    public void setTime(Timestamp time) {
+        this.time = time;
     }
 
     @Basic
@@ -89,18 +82,22 @@ public class Comments {
 
     @Basic
     @Column(name = "post_id")
-    public long getPostId() {
+    public Long getPostId() {
         return postId;
     }
 
-    public void setPostId(long postId) {
+    public void setPostId(Long postId) {
         this.postId = postId;
     }
 
-    @Override
-    public String toString() {
-        return "CsdnBlog [id=" + id + ", userName=" + userName + ", userPage=" + userPage + ", comefrom="
-                + comefrom + ", time=" + time + ", content=" + content + ", postId=" + postId + "]";
+    @Basic
+    @Column(name = "content_hash")
+    public String getContentHash() {
+        return contentHash;
+    }
+
+    public void setContentHash(String contentHash) {
+        this.contentHash = contentHash;
     }
 
     @Override
@@ -111,12 +108,14 @@ public class Comments {
         Comments comments = (Comments) o;
 
         if (id != comments.id) return false;
-        if (postId != comments.postId) return false;
         if (userName != null ? !userName.equals(comments.userName) : comments.userName != null) return false;
         if (userPage != null ? !userPage.equals(comments.userPage) : comments.userPage != null) return false;
-        if (time != null ? !time.equals(comments.time) : comments.time != null) return false;
         if (comefrom != null ? !comefrom.equals(comments.comefrom) : comments.comefrom != null) return false;
+        if (time != null ? !time.equals(comments.time) : comments.time != null) return false;
         if (content != null ? !content.equals(comments.content) : comments.content != null) return false;
+        if (postId != null ? !postId.equals(comments.postId) : comments.postId != null) return false;
+        if (contentHash != null ? !contentHash.equals(comments.contentHash) : comments.contentHash != null)
+            return false;
 
         return true;
     }
@@ -129,7 +128,8 @@ public class Comments {
         result = 31 * result + (comefrom != null ? comefrom.hashCode() : 0);
         result = 31 * result + (time != null ? time.hashCode() : 0);
         result = 31 * result + (content != null ? content.hashCode() : 0);
-        result = 31 * result + (int) (postId ^ (postId >>> 32));
+        result = 31 * result + (postId != null ? postId.hashCode() : 0);
+        result = 31 * result + (contentHash != null ? contentHash.hashCode() : 0);
         return result;
     }
 }

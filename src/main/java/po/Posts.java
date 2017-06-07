@@ -5,38 +5,25 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.sql.Timestamp;
-import java.util.Date;
 
-
+/**
+ * Created by ywcrm on 2017/6/7.
+ */
 @Entity
 public class Posts {
-
     private long id;
+    private String url;
     private String title;
     private String stamps;
     private String userName;
     private String userPage;
     private String plate;
-    private String secondary_plate;
-    private Date time;
-    private String comefrom;
-    private int checkAmount;
-    private int commentsAmount;
-    private String content;
-    private String url;
     private String secondaryPlate;
-
-    public void setTime(Timestamp time) {
-        this.time = time;
-    }
-
-    public void setCheckAmount(Integer checkAmount) {
-        this.checkAmount = checkAmount;
-    }
-
-    public void setCommentsAmount(Integer commentsAmount) {
-        this.commentsAmount = commentsAmount;
-    }
+    private Timestamp time;
+    private String comefrom;
+    private Integer checkAmount;
+    private Integer commentsAmount;
+    private String content;
 
     @Id
     @Column(name = "id")
@@ -46,6 +33,16 @@ public class Posts {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    @Basic
+    @Column(name = "url")
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     @Basic
@@ -98,21 +95,23 @@ public class Posts {
         this.plate = plate;
     }
 
-    public String getSecondary_plate() {
-        return secondary_plate;
+    @Basic
+    @Column(name = "secondary_plate")
+    public String getSecondaryPlate() {
+        return secondaryPlate;
     }
 
-    public void setSecondary_plate(String secondary_plate) {
-        this.secondary_plate = secondary_plate;
+    public void setSecondaryPlate(String secondaryPlate) {
+        this.secondaryPlate = secondaryPlate;
     }
 
     @Basic
     @Column(name = "time")
-    public Date getTime() {
+    public Timestamp getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(Timestamp time) {
         this.time = time;
     }
 
@@ -128,21 +127,21 @@ public class Posts {
 
     @Basic
     @Column(name = "check_amount")
-    public int getCheckAmount() {
+    public Integer getCheckAmount() {
         return checkAmount;
     }
 
-    public void setCheckAmount(int checkAmount) {
+    public void setCheckAmount(Integer checkAmount) {
         this.checkAmount = checkAmount;
     }
 
     @Basic
     @Column(name = "comments_amount")
-    public int getCommentsAmount() {
+    public Integer getCommentsAmount() {
         return commentsAmount;
     }
 
-    public void setCommentsAmount(int commentsAmount) {
+    public void setCommentsAmount(Integer commentsAmount) {
         this.commentsAmount = commentsAmount;
     }
 
@@ -156,34 +155,6 @@ public class Posts {
         this.content = content;
     }
 
-    @Basic
-    @Column(name = "url")
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    @Override
-    public String toString() {
-        return "CsdnBlog [id=" + id + ", title=" + title + ", stamps=" + stamps + ", user_name=" + userName + ", userPage="
-                + userPage + ", plate=" + plate + ", secondaryPlate=" + secondary_plate + ", time=" + time.toString()
-                + ", comefrom=" + comefrom + ", checkAmount=" + checkAmount + ", commentsAmount=" + commentsAmount + ", content="
-                + content + "]";
-    }
-
-    @Basic
-    @Column(name = "secondary_plate")
-    public String getSecondaryPlate() {
-        return secondaryPlate;
-    }
-
-    public void setSecondaryPlate(String secondaryPlate) {
-        this.secondaryPlate = secondaryPlate;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -192,19 +163,20 @@ public class Posts {
         Posts posts = (Posts) o;
 
         if (id != posts.id) return false;
-        if (checkAmount != posts.checkAmount) return false;
-        if (commentsAmount != posts.commentsAmount) return false;
+        if (url != null ? !url.equals(posts.url) : posts.url != null) return false;
         if (title != null ? !title.equals(posts.title) : posts.title != null) return false;
         if (stamps != null ? !stamps.equals(posts.stamps) : posts.stamps != null) return false;
         if (userName != null ? !userName.equals(posts.userName) : posts.userName != null) return false;
         if (userPage != null ? !userPage.equals(posts.userPage) : posts.userPage != null) return false;
         if (plate != null ? !plate.equals(posts.plate) : posts.plate != null) return false;
-        if (time != null ? !time.equals(posts.time) : posts.time != null) return false;
-        if (comefrom != null ? !comefrom.equals(posts.comefrom) : posts.comefrom != null) return false;
-        if (content != null ? !content.equals(posts.content) : posts.content != null) return false;
-        if (url != null ? !url.equals(posts.url) : posts.url != null) return false;
         if (secondaryPlate != null ? !secondaryPlate.equals(posts.secondaryPlate) : posts.secondaryPlate != null)
             return false;
+        if (time != null ? !time.equals(posts.time) : posts.time != null) return false;
+        if (comefrom != null ? !comefrom.equals(posts.comefrom) : posts.comefrom != null) return false;
+        if (checkAmount != null ? !checkAmount.equals(posts.checkAmount) : posts.checkAmount != null) return false;
+        if (commentsAmount != null ? !commentsAmount.equals(posts.commentsAmount) : posts.commentsAmount != null)
+            return false;
+        if (content != null ? !content.equals(posts.content) : posts.content != null) return false;
 
         return true;
     }
@@ -221,8 +193,8 @@ public class Posts {
         result = 31 * result + (secondaryPlate != null ? secondaryPlate.hashCode() : 0);
         result = 31 * result + (time != null ? time.hashCode() : 0);
         result = 31 * result + (comefrom != null ? comefrom.hashCode() : 0);
-        result = 31 * result + checkAmount;
-        result = 31 * result + commentsAmount;
+        result = 31 * result + (checkAmount != null ? checkAmount.hashCode() : 0);
+        result = 31 * result + (commentsAmount != null ? commentsAmount.hashCode() : 0);
         result = 31 * result + (content != null ? content.hashCode() : 0);
         return result;
     }

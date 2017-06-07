@@ -1,4 +1,4 @@
-import db.PostsDao;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.Test;
 
 /**
@@ -7,6 +7,11 @@ import org.junit.Test;
 public class Test1 {
     @Test
     public void test1() {
-        System.out.println(new PostsDao().findIdByField(String.class, "url", "http://bbs.xiaomi.cn/t-13501785"));
+    }
+
+    @Test
+    public void test2() {
+        String s = DigestUtils.md5Hex("123");
+        System.out.println(s);
     }
 }
