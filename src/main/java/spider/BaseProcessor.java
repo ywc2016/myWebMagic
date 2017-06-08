@@ -14,6 +14,7 @@ import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.processor.PageProcessor;
+import util.MailUtils;
 import util.Utils;
 
 import java.sql.Timestamp;
@@ -413,6 +414,7 @@ public abstract class BaseProcessor implements PageProcessor {
         }
     }
 
+
     public void startSpider() {
         long startTime, endTime;
         System.out.println("【爬虫开始】请耐心等待...");
@@ -422,6 +424,12 @@ public abstract class BaseProcessor implements PageProcessor {
         endTime = System.currentTimeMillis();
         System.out.println("【爬虫结束】耗时约"
                 + ((endTime - startTime) / 1000) + "秒，已保存到数据库，请查看！");
+        //抓取完发送邮件
+        try {
+            new MailUtils().sendEmail();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
