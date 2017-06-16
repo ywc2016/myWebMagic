@@ -45,7 +45,7 @@ public class CommentsDao extends BaseDao<Comments> {
         try {
             String queryString = "from " + typeClass().getCanonicalName()
                     + " as model where model." + "userName" + "= :userName and model.time = :time";
-            Session session = Client.getSessionFactory().openSession();
+            Session session = Client.getSessionFactory().getCurrentSession();
             Query query = session.createQuery(queryString);
             query.setParameter("userName", userName);
             query.setParameter("time", timestamp);

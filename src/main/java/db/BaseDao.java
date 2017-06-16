@@ -30,7 +30,7 @@ public class BaseDao<T> {
         Session session = null;
         try {
             String queryString = "from " + typeClass().getCanonicalName();
-            session = sessionFactory.openSession();
+            session = sessionFactory.getCurrentSession();
 
             Query query = session.createQuery(queryString);
             List<T> pojos = query.list();
@@ -50,7 +50,7 @@ public class BaseDao<T> {
     public void save(T pojo) {
         Session session = null;
         try {
-            session = Client.getSessionFactory().openSession();
+            session = Client.getSessionFactory().getCurrentSession();
             //开启事务
             session.beginTransaction();
 
@@ -81,7 +81,7 @@ public class BaseDao<T> {
         try {
             String queryString = "from " + typeClass().getCanonicalName()
                     + " as model where model." + propertyName + "= ?";
-            Session session = sessionFactory.openSession();
+            Session session = sessionFactory.getCurrentSession();
             Query query = session.createQuery(queryString);
             if (type.equals("String")) {
                 query.setString(0, value.toLowerCase());
