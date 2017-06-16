@@ -2,6 +2,8 @@ package db;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.TransactionException;
 import org.hibernate.query.Query;
 
 import java.lang.reflect.ParameterizedType;
@@ -31,9 +33,10 @@ public class BaseDao<T> {
         try {
             String queryString = "from " + typeClass().getCanonicalName();
             session = sessionFactory.getCurrentSession();
-
+            session.beginTransaction();
             Query query = session.createQuery(queryString);
             List<T> pojos = query.list();
+            session.getTransaction().commit();
             return pojos;
         } catch (RuntimeException re) {
             throw re;
@@ -82,6 +85,7 @@ public class BaseDao<T> {
             String queryString = "from " + typeClass().getCanonicalName()
                     + " as model where model." + propertyName + "= ?";
             Session session = sessionFactory.getCurrentSession();
+            session.beginTransaction();
             Query query = session.createQuery(queryString);
             if (type.equals("String")) {
                 query.setString(0, value.toLowerCase());
@@ -91,6 +95,7 @@ public class BaseDao<T> {
                 query.setInteger(0, Integer.parseInt(value));
             }
             List<T> pojos = query.list();
+            session.getTransaction().commit();
             return pojos;
         } catch (RuntimeException re) {
             throw re;

@@ -221,6 +221,8 @@ public abstract class BaseProcessor implements PageProcessor {
             user.setBadgeIds(utils.listToString(utils.convertBadgeImageListToIdList(badgeImageList)));
 
             userDao.save(user);
+            user = null;
+            sdf = null;
         } catch (NumberFormatException e) {
             e.printStackTrace();
         }

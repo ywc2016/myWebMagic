@@ -1,5 +1,7 @@
 package db;
 
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 import po.CrawledUrl;
 
 import java.sql.PreparedStatement;
@@ -51,6 +53,5 @@ public class CrawledUrlDao extends BaseDao<CrawledUrl> {
         }
         return 0L;
     }
-
 
 }
