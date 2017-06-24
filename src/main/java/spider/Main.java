@@ -8,7 +8,8 @@ public class Main {
 //        new OtherProcessor("http://bbs.xiaomi.cn/f-451-12").startSpider();//小米5/5c/5s/Plus
 //        new BaseByUserProcessor().startSpider();
 //        new XiaomiHomePageProcessor().startSpider();
-        new Xiaomi6PageProcessor().startSpider();
+//        new Xiaomi6PageProcessor().startSpider();
+        new XiaomiNote2Processor().startSpider();
     }
 
 }
