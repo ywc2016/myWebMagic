@@ -39,7 +39,8 @@ public abstract class BaseProcessor implements PageProcessor {
     private String firstPageOfPostUrlPattern = null;//domain + "/t\\-\\d+$"
     private String secondPageOfPostUrlPattern = null;//this.domain + "/t-\\d+-\\d+-o1#comment_top"
     private String userHomePageUrlPattern = this.domain + "/u-detail-\\d+$";
-
+    private String userPostsFirstPage = this.domain + "/u-thread-\\d+$";
+    private String userPostsSecondPage = this.domain + "/u-thread-\\d-\\d#thread";
 
     //   抓取网站的相关配置，包括：编码、抓取间隔、重试次数等
     private Site site = Site.me().setRetryTimes(3).setSleepTime(1000);
@@ -126,20 +127,23 @@ public abstract class BaseProcessor implements PageProcessor {
             User user = new User();
             user.setMiid(Long.parseLong(page.getHtml()
                     .xpath("//ul[@class='msg']/li/span[@class='num']/text()").all().get(0)));
+
+            //添加个人帖子url
+            try {
+//                    System.out.println(page.getHtml().xpath("//li[@class='menu_item current']/a/@href").all().size());
+                String url1 = page.getHtml().xpath("//div[@class='menu_item']/a/@href").all().get(0);
+                page.addTargetRequest(url1);
+                crawledUrlDao.add(url1);
+            } catch (Exception e) {
+                System.out.println("个人帖子url有误!" + page.getHtml()
+                        .xpath("//div[@class='menu_item']/a/@href").all().toString());
+                e.printStackTrace();
+            }
+
             if (userDao.hasUserByMiid(user.getMiid())) {
                 return;
             }
-//                //添加个人帖子url
-//                try {
-////                    System.out.println(page.getHtml().xpath("//li[@class='menu_item current']/a/@href").all().size());
-//                    String url1 = page.getHtml().xpath("//div[@class='nav_menu']//li/a/@href").all().get(1);
-//                    page.addTargetRequest(url1);
-//                    crawledUrlDao.add(url1);
-//                } catch (Exception e) {
-//                    System.out.println("个人帖子url有误!" + page.getHtml()
-//                            .xpath("//li[@class='menu_item current']/a/@href").all().toString());
-//                    e.printStackTrace();
-//                }
+
             user.setTopicNum(Integer.parseInt(page.getHtml()
                     .xpath("//div[@class='wrap lively']/ul/li/span[@class='num']/text()").all().get(0)));
             user.setReplyNum(Integer.parseInt(page.getHtml()
@@ -369,6 +373,7 @@ public abstract class BaseProcessor implements PageProcessor {
             if (m.find()) {
                 postUrl = m.group(1);
             }
+
         }
         long postId = postsDao.findIdByField("String", "url", postUrl);
         List<String> list = page.getHtml().xpath("//ul[@class='reply_list']/").all();
