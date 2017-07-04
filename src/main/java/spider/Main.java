@@ -9,7 +9,8 @@ public class Main {
 //        new BaseByUserProcessor().startSpider();
 //        new XiaomiHomePageProcessor().startSpider();
 //        new Xiaomi6PageProcessor().startSpider();
-        new XiaomiNote2Processor().startSpider();
+//        new XiaomiNote2Processor().startSpider();
+        new BaseByUserProcessor().startSpider();
     }
 
 }

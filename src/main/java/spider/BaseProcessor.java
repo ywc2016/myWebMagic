@@ -39,7 +39,10 @@ public abstract class BaseProcessor implements PageProcessor {
     private String firstPageOfPostUrlPattern = null;//domain + "/t\\-\\d+$"
     private String secondPageOfPostUrlPattern = null;//this.domain + "/t-\\d+-\\d+-o1#comment_top"
     private String userHomePageUrlPattern = this.domain + "/u-detail-\\d+$";
-
+    private String userPostsListFirstPage = this.domain + "/u-thread-\\d+$";
+    private String userPostsListSecondPage = this.domain + "/u-thread-\\d-\\d#thread";
+    private String userPostFirstPage = null;//http://bbs.xiaomi.cn/t-10870260 用户帖子的第一页
+    private String userPostSecondPage = null;//http://bbs.xiaomi.cn/t-10870260 用户帖子的第二页
 
     //   抓取网站的相关配置，包括：编码、抓取间隔、重试次数等
     private Site site = Site.me().setRetryTimes(3).setSleepTime(1000);
@@ -56,6 +59,14 @@ public abstract class BaseProcessor implements PageProcessor {
     private String patterOfSecondPageOfPost = "(" + this.domain + "/t-\\d+)-\\d+-o1#comment_top";
     private Calendar c = Calendar.getInstance();
     private int curYear = c.get(Calendar.YEAR);
+
+    public void setUserPostFirstPage(String userPostFirstPage) {
+        this.userPostFirstPage = userPostFirstPage;
+    }
+
+    public void setUserPostSecondPage(String userPostSecondPage) {
+        this.userPostSecondPage = userPostSecondPage;
+    }
 
     public String getDomain() {
         return domain;
@@ -116,6 +127,53 @@ public abstract class BaseProcessor implements PageProcessor {
         } else if (page.getUrl().regex(this.userHomePageUrlPattern).match()) { // 用户主页
             processUserHomePage(page);
 
+        } else if (page.getUrl().regex(this.userPostsListFirstPage).match()) {//用户帖子列表首页
+
+            processUserPostListPage(page);
+
+        } else if (page.getUrl().regex(this.userPostsListSecondPage).match()) {//用户帖子列表第二页及以后
+
+            processUserPostListPage(page);
+
+        } else if (page.getUrl().regex(this.userPostsListFirstPage).match()) {//用户帖子首页
+
+            processFirstPostPage(page);
+        } else if (page.getUrl().regex(this.userPostSecondPage).match()) {//用户帖子第二页
+
+            processSecondPostPage(page);
+
+        }
+    }
+
+
+    /**
+     * 用户帖子列表页
+     *
+     * @param page
+     */
+    private void processUserPostListPage(Page page) {
+        try {
+            // 首先添加下一页
+            String url = page.getHtml().xpath("//li[@class='next']/a/@href").all().get(0);
+
+            if (url == null || "".equals(url)) {
+                System.out.println("没有下一页帖子!");
+            }
+            page.addTargetRequest(url);
+            crawledUrlDao.add(url);
+        } catch (Exception e) {
+            System.out.println("添加下一页帖子失败!");
+            e.printStackTrace();
+        }
+
+        try {
+            // 添加该页中所有的帖子进入队列
+            List<String> addUrlList = page.getHtml().xpath("//div[@class='theme_list_con']/div[@class='title']/a/@href").all();
+            page.addTargetRequests(addUrlList);// 限定文章列表获取区域
+//            page.addTargetRequest(page.getHtml().xpath("//li[@class='theme_list clearfix']/div[@class='theme_list_con']/div[@class='title']/a/@href").all().get(0));
+            crawledUrlDao.addAll(addUrlList);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -126,20 +184,23 @@ public abstract class BaseProcessor implements PageProcessor {
             User user = new User();
             user.setMiid(Long.parseLong(page.getHtml()
                     .xpath("//ul[@class='msg']/li/span[@class='num']/text()").all().get(0)));
+
+            //添加个人帖子url
+            try {
+//                    System.out.println(page.getHtml().xpath("//li[@class='menu_item current']/a/@href").all().size());
+                String url1 = page.getHtml().xpath("//li[@class='menu_item']/a/@href").all().get(1);
+                page.addTargetRequest(url1);
+                crawledUrlDao.add(url1);
+            } catch (Exception e) {
+                System.out.println("个人帖子url有误!" + page.getHtml()
+                        .xpath("//div[@class='menu_item']/a/@href").all().toString());
+                e.printStackTrace();
+            }
+
             if (userDao.hasUserByMiid(user.getMiid())) {
                 return;
             }
-//                //添加个人帖子url
-//                try {
-////                    System.out.println(page.getHtml().xpath("//li[@class='menu_item current']/a/@href").all().size());
-//                    String url1 = page.getHtml().xpath("//div[@class='nav_menu']//li/a/@href").all().get(1);
-//                    page.addTargetRequest(url1);
-//                    crawledUrlDao.add(url1);
-//                } catch (Exception e) {
-//                    System.out.println("个人帖子url有误!" + page.getHtml()
-//                            .xpath("//li[@class='menu_item current']/a/@href").all().toString());
-//                    e.printStackTrace();
-//                }
+
             user.setTopicNum(Integer.parseInt(page.getHtml()
                     .xpath("//div[@class='wrap lively']/ul/li/span[@class='num']/text()").all().get(0)));
             user.setReplyNum(Integer.parseInt(page.getHtml()
@@ -291,6 +352,7 @@ public abstract class BaseProcessor implements PageProcessor {
             }
 
         } catch (NumberFormatException e) {
+            System.out.println("添加新的帖子失败.");
             e.printStackTrace();
         }
         //抓取回复内容
@@ -369,6 +431,7 @@ public abstract class BaseProcessor implements PageProcessor {
             if (m.find()) {
                 postUrl = m.group(1);
             }
+
         }
         long postId = postsDao.findIdByField("String", "url", postUrl);
         List<String> list = page.getHtml().xpath("//ul[@class='reply_list']/").all();
